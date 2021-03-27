@@ -6,8 +6,8 @@ module.exports = {
 
     /**
      * Seek any data stored in Redis DB with <key> reference
-     * 
-     * @param {String} key 
+     *
+     * @param {String} key
      * @return {Object} data object stored at <key>
      */
     read(key) {
@@ -24,11 +24,11 @@ module.exports = {
     },
 
     /**
-     * Store any data type as a JSON object in Redis DB 
+     * Store any data type as a JSON object in Redis DB
      * using <key> as reference
-     * 
-     * @param {String} key 
-     * @param {any} value 
+     *
+     * @param {String} key
+     * @param {any} value
      * @returns {String} "OK" if operation successfull
      */
     store(key, value) {
@@ -45,11 +45,11 @@ module.exports = {
     },
 
     /**
-     * Check if any data exists in Redis DB stored under <key> 
-     * 
-     * @param {String} key 
+     * Check if any data exists in Redis DB stored under <key>
+     *
+     * @param {String} key
      * @returns{Number} 1 if datas exists, 0 if no datas
-     * 
+     *
      */
     has(key) {
         return new Promise((resolve, reject) => {
@@ -83,15 +83,14 @@ module.exports = {
     },
 
     /**
-     * Check if any data exists in Redis DB stored under <key> 
+     * Check if any data exists in Redis DB stored under <key>
      * - if <key> exists return stored data
-     * - if not, executes callback query, stored its results in Redis and returns it 
-     * @param {*} key 
-     * @param {*} callback 
+     * - if not, executes callback query, stored its results in Redis and returns it
+     * @param {*} key
+     * @param {*} callback
      * @returns {Array} array of data expected to be returned from the callback passed in param
      */
     async wrapper(key, callback){
-
         // activate / deactivate wrapper
         if (!process.env.CACHE_ENABLED === false){
             console.log("Redis cache disabled")
@@ -100,20 +99,23 @@ module.exports = {
         }
         // -------------------------------
         console.log("Redis cache enabled")
-        const cached = await this.read(key);
+        // Check if key already exist in Redis DB
         const valueAlreadyInCache = await this.has(key);
+        // If not, execute callback function and store result in Redis
         if (!valueAlreadyInCache){
             const result = await callback();
             if(result !== undefined){
                 await this.store(key, JSON.stringify(result));
             }
             return result;
-        }else {
+        }
+        // If so, retrieve data from Redis
+        else {
+            const cached = await this.read(key);
             const result = JSON.parse(cached);
             console.log(`cache found for "${key}"`);
             return result
         }
-
     }
 
 

@@ -9,8 +9,8 @@ module.exports = {
     /**
      * Create <nb> number of user using faker package for
      * generating random content and store them in DB
-     * 
-     * @param {number} nb 
+     *
+     * @param {number} nb
      * @returns {Array} array containing created user emails
      */
     async user(nb){
@@ -37,12 +37,12 @@ module.exports = {
                     RETURNING *`,
                     [name, email, password])
                 .catch(error => {throw {msg:error.stack,code:error.code}})
-                
+
                 console.log(insertion.rows[0])
                 accountsCreated.push(insertion.rows[0].email)
             }
             return accountsCreated;
-    
+
         } catch(error){
             console.log('\x1b[31m%s\x1b[0m', error)
             throw error
@@ -50,36 +50,37 @@ module.exports = {
     },
 
     /**
-     * Create <nb> number of projects with  2 random needs 
-     * around gps coordinates of <place> with <userId> as author Id using faker 
+     * Create <nb> number of projects with  2 random needs
+     * around gps coordinates of <place> with <userId> as author Id using faker
      * package for generating random content and store them in DB.
      * Also generates for each project created an
-     * 
-     * @param {Number} userId 
-     * @param {String} place 
-     * @param {Number} nb 
+     *
+     * @param {Number} userId
+     * @param {String} place
+     * @param {Number} nb
      * @returns {Array} array containing created projects
      */
     async project(userId, place, nb){
         try{
+            // Initializes new project list
             let projectsCreated = []
+            // Converts place to GPS coordinates using Nominatim API
             const geo = await this.convertToGeo(place);
-            console.log(geo)
-            nb = nb > 3? 3 : nb;
+
             for(let i = 0; i < nb; i++) {
+                // Generate dummy datas for a new project
                 const title = faker.lorem.words(4);
                 const description = faker.lorem.paragraph();
                 const expiration_date = faker.date.between('2020-10-01', '2024-01-05')
-                
+                // Generate dummy GPS coordinates around place givent in parameter
                 const coordinates = faker.address.nearbyGPSCoordinate([geo.lat, geo.long], 8)
                 const lat = parseFloat(coordinates[0]);
                 const long = parseFloat(coordinates[1]);
-
+                // Convert dummy GPS coordinates to address (city name)
                 const location = await this.convertToAddress(lat, long);
-                
+                // User ID in parameter is set as project author
                 const author = userId;
-
-
+                // Insert project in DB
                 const projectInsertion = await client
                 .query(`
                     INSERT INTO projects(
@@ -95,10 +96,13 @@ module.exports = {
                     [title, description, expiration_date, location, lat, long, author])
                 .catch(error => {throw {msg:error.stack,code:error.code}})
                 const projectCreated = projectInsertion.rows[0];
+                // Generate 2 needs for each ew project
                 projectCreated.need = []
                 for(let i = 0; i < 2; i++) {
+                    // Generate new need content
                     const title = faker.lorem.words(2);
                     const description = faker.lorem.sentence();
+                    // Insert new need in DB
                     const needInsertion = await client
                     .query(`
                         INSERT INTO needs(
@@ -111,11 +115,12 @@ module.exports = {
                     .catch(error => {throw {msg:error.stack,code:error.code}})
                     projectCreated.need.push(needInsertion.rows[0])
                 }
-                
+
                 projectsCreated.push(projectCreated)
             }
+            // Return all new project created with their needs
             return projectsCreated;
-    
+
         } catch(error){
             console.log('\x1b[31m%s\x1b[0m', error)
             return error
@@ -125,9 +130,9 @@ module.exports = {
     /**
      * Determine place name related to provided coordinates
      * using Nominaim API
-     * 
-     * @param {Number} lat 
-     * @param {Number} long 
+     *
+     * @param {Number} lat
+     * @param {Number} long
      * @returns {String} name of city or village related to provided coordinates
      */
     async convertToAddress(lat, long) {
@@ -143,7 +148,7 @@ module.exports = {
                   addressdetails: 1,
                 },
             });
-            
+
             const data = await axios
                 .get(query)
                 .catch((error) => {throw error})
@@ -166,8 +171,8 @@ module.exports = {
     /**
      * Determine GPS coordinates related to provided address
      * using Nominaim API
-     * 
-     * @param {String} address 
+     *
+     * @param {String} address
      * @returns {Array} array containing lat & long coordinates
      */
     async convertToGeo(address) {
@@ -182,7 +187,7 @@ module.exports = {
                     limit: 1,
                 },
             });
-            
+
             const data = await axios
                 .get(query)
                 .catch((error) => {throw error})
@@ -192,7 +197,7 @@ module.exports = {
             return error
         }
     }
-    
+
 
 
 

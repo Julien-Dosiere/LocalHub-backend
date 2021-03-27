@@ -30,7 +30,7 @@ class UserDataSource extends DataSource {
     };
 
     async insertUser(user) {
-        try{ 
+        try{
             const insertion = await this.client
                 .query(`
                     INSERT INTO users(
@@ -46,7 +46,7 @@ class UserDataSource extends DataSource {
                 .catch(error => {throw {msg:error.stack,code:error.code}})
 
             timestampsToIso(insertion.rows);
-            
+
             return insertion.rows[0];
 
         } catch (error) {
@@ -74,8 +74,6 @@ class UserDataSource extends DataSource {
 
             if (!update.rows[0])
                 throw {msg:"User not found", code:"10"}
-
-
             timestampsToIso(update.rows[0]);
 
             return update.rows[0];
@@ -99,7 +97,7 @@ class UserDataSource extends DataSource {
                 `,
                 [newInfos.password, user.id])
             .catch(error => {throw {msg:error.stack,code:error.code}})
-            
+
             if (!update.rows[0])
                 throw {msg:"User not found", code:"10"}
 
@@ -124,10 +122,10 @@ class UserDataSource extends DataSource {
                 [user.id]
                 )
             .catch(error => {throw {msg:error.stack,code:error.code}})
-            
+
             if (!deletion.rows[0])
                 throw {msg:"User not found", code:"10"}
-            
+
             timestampsToIso(deletion.rows[0]);
             return deletion.rows[0];
 

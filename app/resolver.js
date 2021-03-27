@@ -2,13 +2,13 @@ const { need } = require("./dataSource");
 
 module.exports = {
     Query: {
-    
+
         async projects(_, __, context) {
                 return await context.dataSources.project.findAllProjects();
         },
 
         async project(_, args, context) {
-            
+
             return await context.dataSources.project.findProjectById(args.id, context.user);
         },
 
@@ -22,7 +22,7 @@ module.exports = {
         },
 
         async myInfos(_, __, context) {
-            if (!context.user) 
+            if (!context.user)
                 return{error:{msg: context.error, code: context.code}}
             return await context.dataSources.user.findUserById(context.user.id);
         },
@@ -33,7 +33,7 @@ module.exports = {
 
         async need(_, args, context) {
             return await context.dataSources.need.findNeedById(args.id);
-            
+
         },
 
         async comment(_, args, context) {
@@ -54,72 +54,72 @@ module.exports = {
         },
 
         async editUserInfos(_, args, context) {
-            if (!context.user) 
+            if (!context.user)
                 return{error:{msg: context.error, code: context.code}}
             return await context.dataSources.user.editUserInfos(args, context.user);
         },
 
 
         async editUserPassword(_, args, context) {
-            if (!context.user) 
+            if (!context.user)
                 return{error:{msg: context.error, code: context.code}}
 
             return await context.dataSources.user.editUserPassword(args, context.user);
         },
 
         async deleteUser(_, args, context) {
-            if (!context.user) 
+            if (!context.user)
                 return{error:{msg: context.error, code: context.code}}
 
             return await context.dataSources.user.deleteUser(context.user);
         },
 
         async insertProject(_, args, context) {
-            if (!context.user) 
+            if (!context.user)
                 return{error:{msg: context.error, code: context.code}}
 
             const newProject = await context.dataSources.project.insertProject(args, context.user);
-            
+
             return newProject;
 
         },
 
         async editProject(_, args, context) {
-            if (!context.user) 
+            if (!context.user)
                 return{error:{msg: context.error, code: context.code}}
 
             return await context.dataSources.project.editProject(args, context.user);
         },
 
         async archiveProject(_, args, context) {
-            if (!context.user) 
+            if (!context.user)
                 return{error:{msg: context.error, code: context.code}}
 
             return await context.dataSources.project.archiveProject(args, context.user);
         },
-    
-    
+
+
 
         async deleteProject(_, args, context) {
-            if (!context.user) 
+            if (!context.user)
                 return{error:{msg: context.error, code: context.code}}
 
             return await context.dataSources.project.deleteProject(args.id, context.user);
-        
+
         },
 
 
         async insertNeed(_, args, context) {
-            if (!context.user) 
+            if (!context.user)
                 return{error:{msg: context.error, code: context.code}}
 
             return await context.dataSources.need.insertNeed(args, context.user)
-            
-            
+
+
         },
 
         async editNeed(_, args, context) {
-            if (!context.user) 
+            if (!context.user)
                 return{error:{msg: context.error, code: context.code}}
 
             return await context.dataSources.need.editNeed(args, context.user);
@@ -127,42 +127,42 @@ module.exports = {
         },
 
         async deleteNeed(_, args, context) {
-            if (!context.user) 
+            if (!context.user)
                 return{error:{msg: context.error, code: context.code}}
 
             return await context.dataSources.need.deleteNeed(args, context.user);
         },
 
         async needCompletion(_, args, context) {
-            if (!context.user) 
+            if (!context.user)
                 return{error:{msg: context.error, code: context.code}}
 
             return await context.dataSources.need.needCompletion(args, context.user);
         },
 
         async completeNeed(_, args, context) {
-            if (!context.user) 
+            if (!context.user)
                 return{error:{msg: context.error, code: context.code}}
 
             return await context.dataSources.need.completeNeed(args, context.user);
         },
 
         async uncompleteNeed(_, args, context) {
-            if (!context.user) 
+            if (!context.user)
                 return{error:{msg: context.error, code: context.code}}
 
             return await context.dataSources.need.uncompleteNeed(args, context.user);
         },
 
         async insertFavorite(_, args, context) {
-            if (!context.user) 
+            if (!context.user)
                 return{error:{msg: context.error, code: context.code}}
 
             return await context.dataSources.favorite.insertFavorite(args.projectId, context.user);
         },
 
         async deleteFavorite(_, args, context) {
-            if (!context.user) 
+            if (!context.user)
                 return{error:{msg: context.error, code: context.code}}
 
             return await context.dataSources.favorite.deleteFavorite(args.projectId, context.user);
@@ -170,7 +170,7 @@ module.exports = {
     },
 
     Project: {
-        
+
         async author(project, _, context) {
             return await context.dataSources.user.findUserById(project.author);
         },
@@ -210,7 +210,7 @@ module.exports = {
             const projects = [];
             for(const projectId of projectsIds){
                 projects.push(await context.dataSources.project.findProjectById(projectId, context.user))
-            };
+            }
             return projects;
         }
     },
@@ -248,11 +248,11 @@ module.exports = {
     UserResult: {
         __resolveType(obj, context, info){
             if(obj.id){
-                return 'User';      
-            }      
-            if(obj.error){        
-                return 'Error';      
-            }      
+                return 'User';
+            }
+            if(obj.error){
+                return 'Error';
+            }
             return null; // GraphQLError is thrown    },
         }
     },
@@ -260,11 +260,11 @@ module.exports = {
     ProjectResult: {
         __resolveType(obj, context, info){
             if(obj.id){
-                return 'Project';      
-            }      
-            if(obj.error){        
-                return 'Error';      
-            }      
+                return 'Project';
+            }
+            if(obj.error){
+                return 'Error';
+            }
             return null; // GraphQLError is thrown    },
         }
     },
@@ -272,11 +272,11 @@ module.exports = {
     NeedResult: {
         __resolveType(obj, context, info){
             if(obj.id){
-                return 'Need';      
-            }      
-            if(obj.error){        
-                return 'Error';      
-            }      
+                return 'Need';
+            }
+            if(obj.error){
+                return 'Error';
+            }
             return null; // GraphQLError is thrown    },
         }
     },
@@ -284,11 +284,11 @@ module.exports = {
     FavoriteResult: {
         __resolveType(obj, context, info){
             if(obj.id){
-                return 'Favorite';      
-            }      
-            if(obj.error){        
-                return 'Error';      
-            }      
+                return 'Favorite';
+            }
+            if(obj.error){
+                return 'Error';
+            }
             return null;
         }
     }

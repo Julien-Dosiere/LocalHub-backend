@@ -53,8 +53,8 @@ class ProjectDataSource extends DataSource {
             OR archived = FALSE)
             `, [
                 geoMin.latitude,
-                geoMin.longitude, 
-                geoMax.latitude, 
+                geoMin.longitude,
+                geoMax.latitude,
                 geoMax.longitude,
                 archived
             ]);
@@ -76,7 +76,7 @@ class ProjectDataSource extends DataSource {
 
         await this.defineUserRelations(results, user);
 
-        
+
 
         return results;
     }
@@ -116,9 +116,9 @@ class ProjectDataSource extends DataSource {
             if (!projectToUpdade)
                 throw {msg:"project to update not found", code:"whatever"};
 
-            if (projectToUpdade.author != user.id)
+            if (projectToUpdade.author !== user.id)
                 throw {msg:"User is not author, project editing not allowed", code: "whatever"};
-            
+
             const update = await this.client
                 .query(`
                     UPDATE projects
@@ -132,17 +132,17 @@ class ProjectDataSource extends DataSource {
                     WHERE id = $7
                     RETURNING *`,
                     [
-                        project.title, 
+                        project.title,
                         project.description, project.expiration_date, project.location, project.lat, project.long, project.id])
                 .catch(error => {throw {msg:error.stack,code:error.code}})
-            
+
                 timestampsToIso(update.rows);
 
             await this.defineUserRelations(update.rows, user);
-            
+
             const updatedProject = update.rows[0]
 
-            return updatedProject;    
+            return updatedProject;
         } catch(error) {
             console.log('\x1b[31m%s\x1b[0m', error)
             return{error: error}
@@ -157,7 +157,7 @@ class ProjectDataSource extends DataSource {
 
             if (projectToArchive.author != user.id)
                 throw {msg:"User is not author, project archiving not allowed", code: "whatever"};
-            
+
             const update = await this.client
                 .query(`
                     UPDATE projects
@@ -167,14 +167,14 @@ class ProjectDataSource extends DataSource {
                     RETURNING *`,
                     [project.id])
                 .catch(error => {throw {msg:error.stack,code:error.code}})
-            
+
                 timestampsToIso(update.rows);
 
             await this.defineUserRelations(update.rows, user);
-            
+
             const updatedProject = update.rows[0]
 
-            return updatedProject;    
+            return updatedProject;
         } catch(error) {
             console.log('\x1b[31m%s\x1b[0m', error)
             return{error: error}
@@ -189,7 +189,7 @@ class ProjectDataSource extends DataSource {
 
             if (project.author != user.id)
                 throw {msg: "Current user is not author, deletion not allowed", code:10};
-            
+
             const deletion = await this.client
             .query(`
                 DELETE FROM projects
@@ -213,7 +213,7 @@ class ProjectDataSource extends DataSource {
         const result = await this.client.query(
             'SELECT * FROM projects WHERE id = ANY($1)',
             [ids]);
-            
+
         const data = ids.map(id => {
             return result.rows.find( project => project.id == id);
         });
@@ -238,8 +238,8 @@ class ProjectDataSource extends DataSource {
     });
 
     /**
-     * Define relations between project queried and the user making queries 
-     * Put 2 boolean properties; .userIsAuthor & .isFollowed, on each project 
+     * Define relations between project queried and the user making queries
+     * Put 2 boolean properties; .userIsAuthor & .isFollowed, on each project
      * of the passed array.
      * @param {Array} projects an array containing projects
      * @param {Object} user a user object (may be undefined)
@@ -288,8 +288,8 @@ class ProjectDataSource extends DataSource {
         }
     };
     /**
-     * Define distance between search position and projects passed 
-     * Put 1 .distance property of type float, on each project 
+     * Define distance between search position and projects passed
+     * Put 1 .distance property of type float, on each project
      * of the passed array.
      * @param {Array} projects an array containing projects
      * @param {Number} lat search position latiture (float type)
