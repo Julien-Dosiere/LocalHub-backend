@@ -9,6 +9,20 @@ const app = express();
 const myCors = require('./app/middlewares/myCors')
 const tokenCheck = require('./app/middlewares/tokenCheck')
 const morgan = require('morgan');
+const http = require('http').Server;
+const ws = require('socket.io');
+const server = http(app);
+const io = ws(server,{
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+
+
+
+
+
 
 
 // Clear cache memory at server start
@@ -32,8 +46,28 @@ app.use(fileUpload({
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({extended: true}));
 
-// Check authentification token status 
+// Check authentification token status
 app.use(tokenCheck.unless({path:['/token']}));
+
+let user;
+app.use((request, response, next) => {
+    user = response.locals.user ?? "no user"
+
+    next();
+});
+
+
+io.on('connection', (socket) => {
+    console.log('>> socket.io - connected');
+    socket.on('send_message', (message) => {
+        // eslint-disable-next-line no-plusplus
+        //message.id = ++id;
+        message.author = user
+        console.log(message);
+        //console.log(id);
+        io.emit('send_message', message);
+    });
+});
 
 // Routing for all non-graphQL requests
 app.use(router);
@@ -45,6 +79,6 @@ graphQLServer.applyMiddleware({ app, cors: {
 } });
 
 // Define server's listening port
-app.listen(process.env.PORT || 3000, () => {
+server.listen(process.env.PORT || 3000, () => {
     console.log('Server running on :', process.env.PORT);
 });
