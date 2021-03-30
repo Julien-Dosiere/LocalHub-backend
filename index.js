@@ -10,17 +10,13 @@ const myCors = require('./app/middlewares/myCors')
 const tokenCheck = require('./app/middlewares/tokenCheck')
 const morgan = require('morgan');
 const http = require('http').Server;
-const ws = require('socket.io');
 const server = http(app);
-const io = ws(server,{
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
-});
-
-
-
+//const SocketService = require('./app/websocket')
+// const Socket = require('./app/websocket')
+// const socket = new Socket()
+// socket.connect(server);
+const websocket = require('./app/middlewares/websocket')
+const ws = require('socket.io');
 
 
 
@@ -49,34 +45,49 @@ app.use(bodyparser.urlencoded({extended: true}));
 // Check authentification token status
 app.use(tokenCheck.unless({path:['/token']}));
 
-let user;
-app.use((request, response, next) => {
-    user = response.locals.user ?? "no user"
-
+let user
+app.use((req, res, next) => {
+    user = res.locals.user
     next();
 });
 
 
-io.on('connection', (socket) => {
-    console.log('>> socket.io - connected');
-    socket.on('send_message', (message) => {
-        // eslint-disable-next-line no-plusplus
-        //message.id = ++id;
-        message.author = user
-        console.log(message);
-        //console.log(id);
-        io.emit('send_message', message);
-    });
-});
+    // socket.on('send_message', (message) => {
+    //     // eslint-disable-next-line no-plusplus
+    //     //message.id = ++id;
+    //     message.author = user ?? "no user"
+    //     console.log(message);
+    //     //console.log(id);
+    //     io.emit('send_message', message);
+    // });
 
-// Routing for all non-graphQL requests
+
+
+
+//Routing for all non-graphQL requests
 app.use(router);
+//app.locals.io = io
 
+
+// app.use(websocket);
 // Handle GraphQL requests on route "/graphql" and reapply CORS policy disabled by GraphQL
 graphQLServer.applyMiddleware({ app, cors: {
     origin: '*',
     credentials: true
 } });
+
+const io = ws(server,{
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
+
+
+const websocketMW = require('./app/middlewares/websocket')
+io.use(websocketMW);
+
+
 
 // Define server's listening port
 server.listen(process.env.PORT || 3000, () => {
