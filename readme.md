@@ -3,13 +3,15 @@
 ## Description
 
 This application was developed to serve as the backend of the Localhub front app. Its main role is to provide data related to users & projects objects stored in database through a GraphQL API to the frontend.
-It was developed using framework Express.js, PostgresQL database and Apollo for implementing GraphQL.
+It was developed using framework Express.js, PostgresQL database, Websocket and Apollo for 
+implementing GraphQL.
 
 Project might still evolve in the coming months, but here are its current main features:
 - User authentification (using JWT)
 - User & Projects management with associated needs (CRUD model)
 - Project search using geo coordinates
 - Upload of images & files for related projects
+- Comments threads (using Websocket) 
 
 
 
