@@ -136,7 +136,7 @@ class UserDataSource extends DataSource {
     };
 
     userLoader = new DataLoader(async (ids) => {
-        console.log('Running batch function user Loader with', ids);
+        // console.log('Running batch function user Loader with', ids);
 
         const result = await this.client.query(
             'SELECT * FROM users WHERE id = ANY($1)',

@@ -9,7 +9,7 @@ let refreshTokens = [];
 const temporaryTokenDuration = parseInt(process.env.TEMPORARY_TOKEN_DURATION,10) || 1000;
 
 
-/** 
+/**
  * send the API hompage
  */
 router.get('/',async (req, res) => {
@@ -69,7 +69,7 @@ router.post('/login-refresh',async (req, res) => {
 /////////////////////////////////////// Using optionnal refresh tokens
         const refreshToken = jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET);
         refreshTokens.push(refreshToken);
- /////////////////////////////////////// 
+ ///////////////////////////////////////
         res.json({
             token,
             refreshToken, // <-- Using optionnal refresh tokens
@@ -95,7 +95,7 @@ router.post('/token', (req, res) => {
     if (!refreshToken) {
         return res.json({error:'no refresh token'});
     }
-    console.log(refreshTokens)
+    // console.log(refreshTokens)
     if (!refreshTokens.includes(refreshToken)) {
         return res.status(403).json({error:'refresh token not valid anymore, please re-login'});
     }
@@ -112,7 +112,7 @@ router.post('/token', (req, res) => {
     });
 });
 
-// Check authentification token status 
+// Check authentification token status
 //router.use(tokenCheck);
 
 
@@ -127,9 +127,7 @@ router.post('/logout', (req, res) => {
     if (!refreshToken) {
         return res.json({error:'no refresh token'});
     }
-    console.log(refreshTokens);
     refreshTokens = refreshTokens.filter(token => token !== refreshToken);
-    console.log(refreshTokens);
     res.json("Logout successful");
 });
 
@@ -142,7 +140,7 @@ router.post('/logout', (req, res) => {
  */
 router.post('/upload-avatar', async (req, res) => {
     try {
-        if(!req.files) 
+        if(!req.files)
             throw {error:{msg:"file is missing", code:5}}
 
         if(!res.locals.user)
@@ -153,7 +151,7 @@ router.post('/upload-avatar', async (req, res) => {
         let avatar = req.files.avatar;
 
         console.log(`uploading file "${avatar.name}"`);
-         
+
         const filePath = await storeFile.dbUpdateAvatar(avatar.name, user.id)
 
         //Use the mv() method to place the file in upload directory (i.e. "uploads")
@@ -169,7 +167,7 @@ router.post('/upload-avatar', async (req, res) => {
                 size: avatar.size
             }
         });
-        
+
     } catch (err) {
         console.log('\x1b[31m%s\x1b[0m', err)
 
@@ -185,14 +183,14 @@ router.post('/upload-avatar', async (req, res) => {
  */
 router.post('/upload-image', async (req, res) => {
     try {
-        if(!req.files) 
+        if(!req.files)
             throw {error:{msg:"file is missing", code:5}}
 
         if(!res.locals.user)
             throw {error:{msg:"authentification problem", code:9}}
-        
+
         const user = res.locals.user
-        
+
         let image = req.files.image;
 
         if(!req.body.project_id)
@@ -201,7 +199,7 @@ router.post('/upload-image', async (req, res) => {
         const projectId = req.body.project_id;
 
         console.log(`uploading file "${image.name}"`);
-         
+
         const filePath = await storeFile.dbUpdate('image', image.name, user.id, projectId)
 
         image.mv('./public' + filePath);
@@ -215,7 +213,7 @@ router.post('/upload-image', async (req, res) => {
                 size: image.size
             }
         });
-        
+
     } catch (err) {
         console.log('\x1b[31m%s\x1b[0m', err)
 
@@ -231,7 +229,7 @@ router.post('/upload-image', async (req, res) => {
  */
 router.post('/upload-file', async (req, res) => {
     try {
-        if(!req.files) 
+        if(!req.files)
             throw {error:{msg:"file is missing", code:5}}
 
         if(!res.locals.user)
@@ -249,7 +247,7 @@ router.post('/upload-file', async (req, res) => {
         let projectId = req.body.project_id;
 
         console.log(`uploading file "${file.name}"`);
-         
+
         const filePath = await storeFile.dbUpdate('file', file.name, user.id, projectId)
 
         file.mv('./public' + filePath);
@@ -263,7 +261,7 @@ router.post('/upload-file', async (req, res) => {
                 size: file.size
             }
         });
-        
+
     } catch (err) {
         console.log('\x1b[31m%s\x1b[0m', err)
         res.status(500).json(err);

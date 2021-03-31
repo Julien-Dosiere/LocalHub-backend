@@ -20,7 +20,7 @@ class CommentDataSource extends DataSource {
         this.client = config.context.sqlClient;
     }
 
-    
+
 
 
     async findAllComments() {
@@ -28,23 +28,23 @@ class CommentDataSource extends DataSource {
         return result.rows;
     }
     /**
-     * 
-     * @param {*} commentId 
+     *
+     * @param {*} commentId
      */
     async findCommentsById(commentId) {
         await this.commentLoader.clear(commentId)
-        console.log(`-- Adding ${commentId} to need dataloader`);
+        // console.log(`-- Adding ${commentId} to need dataloader`);
         return await this.commentLoader.load(commentId);
     }
 
     async findCommentsByProjectId(projectId) {
         await this.commentsByProjectLoader.clear(projectId);
-        console.log(`-- Adding ${projectId} to need by project dataloader`);
+        // console.log(`-- Adding ${projectId} to need by project dataloader`);
         return await this.commentsByProjectLoader.load(projectId);
     }
 
     commentLoader = new DataLoader(async (ids) => {
-        console.log('Running batch function categoriesLoader with', ids);
+        // console.log('Running batch function categoriesLoader with', ids);
           const result = await this.client.query(
             'SELECT * FROM comments WHERE id = ANY($1)',
             [ids]);
@@ -59,7 +59,7 @@ class CommentDataSource extends DataSource {
 
     commentsByProjectLoader = new DataLoader(async (ids) => {
 
-        console.log('Running batch function projectsByProject with', ids);
+        // console.log('Running batch function projectsByProject with', ids);
 
         const result = await this.client.query(
             'SELECT * FROM comments WHERE project_id = ANY($1)',

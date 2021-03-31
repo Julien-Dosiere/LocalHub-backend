@@ -11,12 +11,10 @@ const tokenCheck = require('./app/middlewares/tokenCheck')
 const morgan = require('morgan');
 const http = require('http').Server;
 const server = http(app);
-//const SocketService = require('./app/websocket')
-// const Socket = require('./app/websocket')
-// const socket = new Socket()
-// socket.connect(server);
-const websocket = require('./app/middlewares/websocket')
+const websocketMW = require('./app/middlewares/websocket')
 const ws = require('socket.io');
+
+
 
 
 
@@ -38,18 +36,14 @@ app.use(fileUpload({
     createParentPath: true
 }));
 
-// Enble body content handling forms & json
+// Enable body content handling forms & json
 app.use(bodyparser.json());
 app.use(bodyparser.urlencoded({extended: true}));
 
 // Check authentification token status
 app.use(tokenCheck.unless({path:['/token']}));
 
-let user
-app.use((req, res, next) => {
-    user = res.locals.user
-    next();
-});
+
 
 
     // socket.on('send_message', (message) => {
@@ -66,26 +60,27 @@ app.use((req, res, next) => {
 
 //Routing for all non-graphQL requests
 app.use(router);
-//app.locals.io = io
 
-
-// app.use(websocket);
-// Handle GraphQL requests on route "/graphql" and reapply CORS policy disabled by GraphQL
-graphQLServer.applyMiddleware({ app, cors: {
-    origin: '*',
-    credentials: true
-} });
-
+// Creating Websocket Server
 const io = ws(server,{
     cors: {
         origin: "*",
         methods: ["GET", "POST"]
     }
 });
-
-
-const websocketMW = require('./app/middlewares/websocket')
+// Using middleware to handle Websocket connections
 io.use(websocketMW);
+
+
+// Handle GraphQL requests on route "/graphql" and reapply CORS policy disabled by GraphQL
+graphQLServer.applyMiddleware({ app, cors: {
+    origin: '*',
+    credentials: true
+} });
+
+
+
+
 
 
 

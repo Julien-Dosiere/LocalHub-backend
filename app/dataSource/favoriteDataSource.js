@@ -2,7 +2,7 @@ const { DataSource } = require('apollo-datasource');
 const DataLoader = require('dataloader');
 const cache = require('../custom_modules/cache');
 
-class NeedDataSource extends DataSource {
+class FavoriteDataSource extends DataSource {
 
     constructor() {
         super();
@@ -44,7 +44,7 @@ class NeedDataSource extends DataSource {
 
     async findFavoritesByProjectId(projectId) {
         const cacheKey = "favoriteByProject"+ projectId.toString();
-        console.log(`favorite By Project ${projectId}`)
+        // console.log(`favorite By Project ${projectId}`)
         return cache.wrapper(cacheKey,async () => {
             const result = await this.client.query(
                 'SELECT * FROM favorites WHERE project_id = $1',
@@ -67,7 +67,7 @@ class NeedDataSource extends DataSource {
         try{
             if(await this.checkIfFavorite(projectId, user))
                 throw {msg:"Favorite already exists",code:"whatever"}
-            
+
             const newFavorite = await this.client
                 .query(`
                     INSERT INTO favorites
@@ -122,7 +122,7 @@ class NeedDataSource extends DataSource {
 
 
     favoriteLoader = new DataLoader(async (ids) => {
-        console.log('Running batch function favoritesLoader with', ids);
+        // console.log('Running batch function favoritesLoader with', ids);
 
         const result = await this.client.query(
             'SELECT * FROM favorites WHERE id = ANY($1)',
@@ -134,11 +134,11 @@ class NeedDataSource extends DataSource {
             // les categories correspondantes histoire d'assurer l'ordre
             return result.rows.find( favorite => favorite.id == id);
         });
-  
+
 
         return data;
     });
-   
+
 
     // favoritesByProjectLoader = new DataLoader(async (ids) => {
     //     console.log('Running batch function favoritesByProject with', ids);
@@ -155,7 +155,7 @@ class NeedDataSource extends DataSource {
 
     // favoritesByUserLoader = new DataLoader(async (ids) => {
     //     console.log('Running batch function favoritesByUser with', ids);
-        
+
     //     const result = await this.client.query(
     //         'SELECT * FROM favorites WHERE user_id = ANY($1)',
     //         [ids]);
@@ -174,7 +174,7 @@ class NeedDataSource extends DataSource {
     //     const result = await this.client.query(
     //         'SELECT * FROM projects WHERE id = ANY($1)',
     //         [ids]);
-            
+
     //     const data = ids.map(id => {
     //         return result.rows.find( project => project.id == id);
     //     });
@@ -183,4 +183,4 @@ class NeedDataSource extends DataSource {
 
 }
 
-module.exports = NeedDataSource;
+module.exports = FavoriteDataSource;

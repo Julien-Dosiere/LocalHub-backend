@@ -26,7 +26,7 @@ class ProjectDataSource extends DataSource {
     }
 
     async findProjectById(projectId, user) {
-        console.log("project by ID search")
+        // console.log("project by ID search")
         const cacheKey = "projectById"+ projectId.toString();
         const project = await cache.wrapper(cacheKey,async () => {
             await this.projectLoader.clear(projectId)
@@ -209,7 +209,7 @@ class ProjectDataSource extends DataSource {
 
 
     projectLoader = new DataLoader(async (ids) => {
-        console.log('Running batch function project Loader with', ids);
+        // console.log('Running batch function project Loader with', ids);
         const result = await this.client.query(
             'SELECT * FROM projects WHERE id = ANY($1)',
             [ids]);
@@ -224,7 +224,7 @@ class ProjectDataSource extends DataSource {
 
     projectsByAuthorLoader = new DataLoader(async (ids) => {
 
-        console.log('Running batch function projectsByAuthor with', ids);
+        // console.log('Running batch function projectsByAuthor with', ids);
 
         const result = await this.client.query(
             'SELECT * FROM projects WHERE author = ANY($1)',
@@ -253,7 +253,7 @@ class ProjectDataSource extends DataSource {
                     if(user.expired){
                         throw {msg:"session expired",code:1}
                     } else {
-                        console.log(`checking relations for user ${user.id}`)
+                        // console.log(`checking relations for user ${user.id}`)
                         const favorites = await this.findFavoritesByUserId(user.id);
                         const projectsIds = favorites.map(favorite => favorite.project_id)
                         projects.forEach(project => {
@@ -267,7 +267,8 @@ class ProjectDataSource extends DataSource {
                             } else {
                                 project.userIsAuthor = false;
                             }
-                            console.log(`author: ${project.author},user: ${user.id}, userIsAuthor ${project.userIsAuthor}`)
+                            // console.log(`author: ${project.author},user: ${user.id},
+                            // userIsAuthor ${project.userIsAuthor}`)
                         });
                     }
                 } else {

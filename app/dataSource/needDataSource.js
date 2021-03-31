@@ -31,7 +31,7 @@ class NeedDataSource extends DataSource {
 
     async findNeedsByProjectId(projectId) {
         await this.needsByProjectLoader.clear(projectId);
-        console.log(`-- Adding ${projectId} to need by project dataloader`);
+        // console.log(`-- Adding ${projectId} to need by project dataloader`);
         return await this.needsByProjectLoader.load(projectId);
     }
 
@@ -48,7 +48,7 @@ class NeedDataSource extends DataSource {
                     RETURNING *`,
                     [need.title, need.description, need.project_id])
                 .catch(error => {throw {msg:error.stack,code:error.code}})
-                
+
             return newNeed.rows[0];
         } catch (error) {
             console.log('\x1b[31m%s\x1b[0m', error)
@@ -101,7 +101,7 @@ class NeedDataSource extends DataSource {
             console.log('\x1b[31m%s\x1b[0m', error)
             return{error: error}
         }
-        
+
     };
 
     async completeNeed(need, user) {
@@ -127,7 +127,7 @@ class NeedDataSource extends DataSource {
             console.log('\x1b[31m%s\x1b[0m', error)
             return{error: error}
         }
-        
+
     };
 
     async uncompleteNeed(need, user) {
@@ -168,10 +168,10 @@ class NeedDataSource extends DataSource {
                 [need.id]
                 )
             .catch(error => {throw {msg:error.stack,code:error.code}})
-            
+
             if (!deletion.rows[0])
                 throw {msg:"Need not found", code:"10"}
-            
+
             return deletion.rows[0];
 
         } catch (error) {
@@ -183,7 +183,7 @@ class NeedDataSource extends DataSource {
 
 
     needLoader = new DataLoader(async (ids) => {
-        console.log('Running batch function categoriesLoader with', ids);
+        //console.log('Running batch function categoriesLoader with', ids);
         // Dans mon loader
         // Je dois trouver un moyen de récupérer les categories correspondants
         // aux id qui me sont donnés
@@ -201,13 +201,13 @@ class NeedDataSource extends DataSource {
             // les categories correspondantes histoire d'assurer l'ordre
             return result.rows.find( author => author.id == id);
         });
-        console.log(data)
+        //console.log(data)
         return data;
     });
 
     needsByProjectLoader = new DataLoader(async (ids) => {
 
-        console.log('Running batch function projectsByAuthor with', ids);
+        //console.log('Running batch function projectsByAuthor with', ids);
 
         const result = await this.client.query(
             'SELECT * FROM needs WHERE project_id = ANY($1)',
